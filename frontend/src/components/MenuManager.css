@@ -1,0 +1,229 @@
+.menu-manager {
+  width: 100%;              /* fill full viewport width */
+  max-width: none;          /* remove fixed max width */
+  margin: 0;                /* remove auto-centering */
+  padding: 24px 32px;       /* comfortable side padding */
+  box-sizing: border-box;   /* ensure padding doesn't overflow */
+  background: #fff;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: white;
+  margin-right: 16px;
+  padding: 8px 12px;
+}
+
+.header h2 {
+  color: #333;
+}
+
+.add-section {
+  margin-bottom: 32px;
+}
+
+/* Bulk actions row */
+.bulk-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* spacing between buttons */
+}
+
+/* Reuse base button style but allow variants */
+.bulk-btn {
+  padding: 10px 18px; /* slightly smaller than add item */
+  font-size: 14px;     /* decrease size */
+  border-radius: 6px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.bulk-btn.not-available {
+  background: #a00; /* red */
+}
+.bulk-btn.available {
+  background: #198754; /* green */
+}
+
+.add-item-btn {
+  background: #28a745;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 6px;
+  margin-right: 8px; /* extra breathing space before bulk buttons */
+}
+
+.add-form {
+  background: #f8f9fa;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 32px;
+}
+
+.add-form h4 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Visibility fixes for labels in dark-themed containers (Menu Manager add form) */
+.menu-manager .add-form .form-group label {
+  color: #f5f5f5 !important; /* force light text for contrast */
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Ensure inputs/selects remain readable regardless of theme */
+.menu-manager .add-form .form-group input,
+.menu-manager .add-form .form-group select {
+  background: #ffffff;
+  color: #111111;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+}
+
+.menu-list h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.menu-item-card {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  position: relative;
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+.menu-item-card.unavailable {
+  opacity: 0.5;
+  filter: grayscale(0.7);
+}
+
+.item-info h4 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.item-info p {
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.category {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.category.veg {
+  background: #d4edda;
+  color: #155724;
+}
+
+.category.non-veg {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.toggle-availability-btn {
+  background: #ffc107;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-availability-btn:hover {
+  background: #e0a800;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.delete-btn:hover {
+  background: #b52a37;
+}
+
+.not-available-label {
+  display: inline-block;
+  background: #f8d7da;
+  color: #721c24;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 2px 8px;
+  margin-left: 8px;
+}

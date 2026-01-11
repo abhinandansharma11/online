@@ -1,0 +1,33 @@
+/* Footer styled to match dark theme with subtle glow accents */
+.site-footer {
+  background: #0f0f10;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  color: #cfcfcf;
+  margin-top: 40px;
+}
+.site-footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.2px;
+}
+.site-footer__inner span {
+  color: #eaeaea;
+}
+
+/* subtle gradient bar for visual polish */
+.site-footer::before {
+  content: "";
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, #ffe60033, #00e0ff33);
+}
+
+@media (max-width: 600px) {
+  .site-footer__inner {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+}
