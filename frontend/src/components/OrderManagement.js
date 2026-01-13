@@ -3,7 +3,23 @@ import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import "./OrderManagement.css";
 
-const API_BASE = (process.env.REACT_APP_API_BASE || '').replace(/\/$/, '') || 'http://localhost:5000';
+let API_BASE = (process.env.REACT_APP_API_BASE || '').replace(/\/$/, '') || 'http://localhost:5000';
+
+// Ensure API_BASE is an absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
+
+// Separate URLs for REST API and Socket.IO
+const API_URL = API_BASE;
+let SOCKET_URL = API_BASE;
+
+// Remove /api suffix for Socket.IO connection
+if (SOCKET_URL.endsWith("/api")) {
+  SOCKET_URL = SOCKET_URL.slice(0, -4);
+} else if (SOCKET_URL.endsWith("/api/")) {
+  SOCKET_URL = SOCKET_URL.slice(0, -5);
+}
 
 const OrderManagement = ({ orders, setOrders }) => {
   const navigate = useNavigate();
@@ -29,7 +45,7 @@ const OrderManagement = ({ orders, setOrders }) => {
       setError(null);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(API_BASE + '/api/orders', {
+        const res = await fetch(API_URL + '/api/orders', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -48,7 +64,7 @@ const OrderManagement = ({ orders, setOrders }) => {
     fetchOrders();
 
     // Socket.io for real-time new orders
-    const socket = io(API_BASE);
+    const socket = io(SOCKET_URL);
     socket.on('newOrder', (order) => {
       // Add new order at the beginning to show it at the top
       setAllOrders((prev) => [order, ...prev]);
@@ -89,7 +105,7 @@ const OrderManagement = ({ orders, setOrders }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(API_BASE + `/api/orders/${orderId}`, {
+      const res = await fetch(API_URL + `/api/orders/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

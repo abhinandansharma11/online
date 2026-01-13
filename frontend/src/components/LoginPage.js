@@ -2,7 +2,13 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./LoginPage.css"
 
-const API_BASE = "https://ingenious-exploration-production.up.railway.app";
+let API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+
+// Ensure API_BASE is an absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
+
 
 
 const LoginPage = ({ setUser }) => {
