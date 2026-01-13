@@ -19,13 +19,16 @@ if (API_BASE.endsWith("/api")) {
 }
 
 const socket = io(API_BASE, {
+  path: '/socket.io/',
   transports: ["websocket", "polling"],
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
   secure: true,
   rejectUnauthorized: false,
+  withCredentials: true
 });
 
 export default socket;

@@ -64,7 +64,13 @@ const OrderManagement = ({ orders, setOrders }) => {
     fetchOrders();
 
     // Socket.io for real-time new orders
-    const socket = io(SOCKET_URL);
+    const socket = io(SOCKET_URL, {
+      path: '/socket.io/',
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
     socket.on('newOrder', (order) => {
       // Add new order at the beginning to show it at the top
       setAllOrders((prev) => [order, ...prev]);
