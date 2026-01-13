@@ -11,27 +11,32 @@ const connectDB = require('./Models/db');
 const app = express();
 const server = http.createServer(app);
 
-// Determine allowed origins
+// Determine allowed origins - allow all Vercel preview deployments and production
 const allowedOrigins = [
-  process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
+  process.env.FRONTEND_BASE_URL,
   'http://localhost:3000',
-  'https://online-nine-chi.vercel.app'
+  'http://localhost:5000',
+  /^https:\/\/.*\.vercel\.app$/  // Allow all Vercel deployments
 ];
 
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
   }
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourceSharing: true
+}));
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
