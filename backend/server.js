@@ -20,12 +20,17 @@ const allowedOrigins = [
 ];
 
 const io = new Server(server, {
+  path: '/socket.io/',
   cors: {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
-  }
+  },
+  transports: ['websocket', 'polling'],
+  upgradeTimeout: 10000,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Middleware
