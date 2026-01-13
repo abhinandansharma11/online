@@ -1,4 +1,6 @@
+console.log('[INIT] Starting application...');
 require('dotenv').config();
+console.log('[INIT] Environment loaded');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -7,7 +9,7 @@ const { Server } = require('socket.io');
 const errorHandler = require('./middleware/errorHandler');
 const connectDB = require('./Models/db');
 
-
+console.log('[INIT] Dependencies loaded');
 const app = express();
 const server = http.createServer(app);
 
@@ -118,12 +120,20 @@ if (fs.existsSync(buildDir)) {
 app.use(errorHandler);
 
 // MongoDB connection
-connectDB().then(() => {
-  server.listen(process.env.PORT || 5000, () => {
-    console.log('Server running on port', process.env.PORT || 5000);
+console.log('[SERVER] Starting server...');
+console.log('[SERVER] Connecting to database...');
+connectDB().then((success) => {
+  console.log('[SERVER] Database connection result:', success);
+  const port = process.env.PORT || 5000;
+  server.listen(port, () => {
+    console.log('[SERVER] Server listening on port', port);
   });
 }).catch((err) => {
-  console.error('Failed to connect to database:', err.message);
-  process.exit(1);
+  console.error('[SERVER] Failed to connect to database:', err.message);
+  // Still start the server even if DB fails
+  const port = process.env.PORT || 5000;
+  server.listen(port, () => {
+    console.log('[SERVER] Server started (DB connection failed, but server is running)');
+  });
 });
 
