@@ -25,15 +25,15 @@ const corsOriginChecker = (origin, callback) => {
   
   // Check if origin is in allowed list
   if (allowedOrigins.includes(origin)) {
-    callback(null, true);
+    return callback(null, true);
   } 
   // Check if origin matches Vercel pattern
   else if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
-    callback(null, true);
+    return callback(null, true);
   } 
   // Otherwise reject
   else {
-    callback(new Error('Not allowed by CORS'));
+    return callback(null, false);
   }
 };
 
