@@ -2,7 +2,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "./LoginPage.css"
 
-const API_BASE = process.env.REACT_APP_API_BASE;
+const API_BASE = "https://ingenious-exploration-production.up.railway.app";
+
 
 const LoginPage = ({ setUser }) => {
   const navigate = useNavigate()
