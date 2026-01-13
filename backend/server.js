@@ -122,5 +122,8 @@ connectDB().then(() => {
   server.listen(process.env.PORT || 5000, () => {
     console.log('Server running on port', process.env.PORT || 5000);
   });
+}).catch((err) => {
+  console.error('Failed to connect to database:', err.message);
+  process.exit(1);
 });
 
