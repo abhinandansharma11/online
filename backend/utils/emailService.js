@@ -1,88 +1,29 @@
-// Safe optional import of Brevo SDK
-let BrevoSdkMod = null;
-try { BrevoSdkMod = require('@getbrevo/brevo'); } catch (_) { BrevoSdkMod = null; }
-const https = require('https');
+const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-// Resolve Brevo module for both CJS and ESM builds
-const resolveBrevo = () => {
-  try {
-    const root = (BrevoSdkMod && BrevoSdkMod.ApiClient)
-      ? BrevoSdkMod
-      : (BrevoSdkMod && BrevoSdkMod.default ? BrevoSdkMod.default : null);
-    return root || null;
-  } catch (_) {
-    return null;
-  }
-};
-
-// Initialize Brevo (Sendinblue) client (returns { api, root } or null)
-const getBrevoAPI = () => {
-  const key = process.env.BREVO_API_KEY;
-  if (!key) return null;
-  const root = resolveBrevo();
-  if (!root || !root.ApiClient) return { api: null, root: null }; // silent fallback
-  const defaultClient = root.ApiClient.instance;
-  const apiKey = defaultClient.authentications && defaultClient.authentications['apiKey'];
-  if (!apiKey) return { api: null, root: null }; // silent fallback
-  apiKey.apiKey = key;
-  return { api: new root.TransactionalEmailsApi(), root };
-};
-
-// Minimal HTTPS sender for Brevo REST when SDK is unavailable
-const sendViaBrevoHTTP = ({ senderEmail, senderName, to, subject, html, text }) => {
-  const key = process.env.BREVO_API_KEY;
-  return new Promise((resolve, reject) => {
-    const payload = JSON.stringify({
-      sender: { email: senderEmail, name: senderName },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html,
-      textContent: text || ''
-    });
-
-    const req = https.request({
-      hostname: 'api.brevo.com',
-      path: '/v3/smtp/email',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'api-key': key,
-        'Content-Length': Buffer.byteLength(payload)
-      },
-      timeout: 12000 // 12s hard timeout to avoid hangs
-    }, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) return resolve({ ok: true });
-        const err = new Error(`Brevo HTTP ${res.statusCode}: ${data}`);
-        err.statusCode = res.statusCode;
-        err.body = data;
-        return reject(err);
-      });
-    });
-
-    req.on('timeout', () => {
-      req.destroy(new Error('ETIMEDOUT_HTTP'));
-    });
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
+// Initialize SMTP transporter
+const getTransporter = () => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true' || false, // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
   });
+
+  return transporter;
 };
 
-// Function to send password reset email (kept same signature and return shape)
+// Function to send password reset email
 const sendResetPasswordEmail = async (userEmail, resetToken) => {
-  const ctx = getBrevoAPI();
+  const senderEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const senderName = process.env.SMTP_FROM_NAME || 'NiteBite';
 
-  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_FROM || process.env.EMAIL_USER;
-  const senderName = process.env.BREVO_SENDER_NAME || 'NiteBite';
-
-  if (!process.env.BREVO_API_KEY) {
-    console.log('\n📧 PASSWORD RESET EMAIL (Development Mode)');
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('\n📧 PASSWORD RESET EMAIL (Development Mode - SMTP not configured)');
     console.log('================================');
     console.log(`To: ${userEmail}`);
     console.log(`Reset Token: ${resetToken}`);
@@ -126,33 +67,31 @@ const sendResetPasswordEmail = async (userEmail, resetToken) => {
     `;
 
   try {
-    if (ctx && ctx.api) {
-      const email = new ctx.root.SendSmtpEmail();
-      email.sender = { email: senderEmail, name: senderName };
-      email.to = [{ email: userEmail }];
-      email.subject = 'Password Reset Request - NiteBite x RGIPT';
-      email.htmlContent = html;
-      await ctx.api.sendTransacEmail(email);
-    } else {
-      await sendViaBrevoHTTP({ senderEmail, senderName, to: userEmail, subject: 'Password Reset Request - NiteBite x RGIPT', html, text: `Your password reset token is ${resetToken}` });
-    }
+    const transporter = getTransporter();
+
+    await transporter.sendMail({
+      from: `"${senderName}" <${senderEmail}>`,
+      to: userEmail,
+      subject: 'Password Reset Request - NiteBite x RGIPT',
+      html: html,
+      text: `Your password reset token is ${resetToken}. This token expires in 15 minutes.`
+    });
+
     console.log(`✅ Password reset email sent to ${userEmail}`);
     return { success: true, message: 'Password reset email sent successfully' };
   } catch (error) {
-    console.error('❌ Email sending error (Brevo):', error && (error.body || error.response?.text || error.message || error));
+    console.error('❌ Email sending error (SMTP):', error.message);
     return { success: false, message: 'Failed to send password reset email' };
   }
 };
 
-// Function to send email verification email (kept same signature and return shape)
+// Function to send email verification email
 const sendEmailVerificationEmail = async (userEmail, verificationToken) => {
-  const ctx = getBrevoAPI();
+  const senderEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const senderName = process.env.SMTP_FROM_NAME || 'NiteBite';
 
-  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_FROM || process.env.EMAIL_USER;
-  const senderName = process.env.BREVO_SENDER_NAME || 'NiteBite';
-
-  if (!process.env.BREVO_API_KEY) {
-    console.log('\n📧 EMAIL VERIFICATION (Development Mode)');
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('\n📧 EMAIL VERIFICATION (Development Mode - SMTP not configured)');
     console.log('================================');
     console.log(`To: ${userEmail}`);
     console.log(`Verification Token: ${verificationToken}`);
@@ -181,7 +120,10 @@ const sendEmailVerificationEmail = async (userEmail, verificationToken) => {
         <ol style="color: #555; line-height: 1.6;">
           <li>Copy the token above and paste it on the Email Verification page</li>
         </ol>
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0;"></div>
+        <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <p style="color: #856404; margin: 0; font-weight: bold;">⚠️ Note:</p>
+          <p style="color: #856404; margin: 5px 0 0 0;">This token will expire in 24 hours.</p>
+        </div>
         <p style="color: #555; line-height: 1.6;">If you did not create this account, you can safely ignore this email.</p>
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
         <p style="font-size: 12px; color: #666; text-align: center;">
@@ -192,20 +134,20 @@ const sendEmailVerificationEmail = async (userEmail, verificationToken) => {
     `;
 
   try {
-    if (ctx && ctx.api) {
-      const email = new ctx.root.SendSmtpEmail();
-      email.sender = { email: senderEmail, name: senderName };
-      email.to = [{ email: userEmail }];
-      email.subject = 'Verify Your Email - NiteBite x RGIPT';
-      email.htmlContent = html;
-      await ctx.api.sendTransacEmail(email);
-    } else {
-      await sendViaBrevoHTTP({ senderEmail, senderName, to: userEmail, subject: 'Verify Your Email - NiteBite x RGIPT', html, text: `Your verification token is ${verificationToken}. Link: ${verificationLink}` });
-    }
+    const transporter = getTransporter();
+
+    await transporter.sendMail({
+      from: `"${senderName}" <${senderEmail}>`,
+      to: userEmail,
+      subject: 'Verify Your Email - NiteBite x RGIPT',
+      html: html,
+      text: `Your verification token is ${verificationToken}. This token expires in 24 hours. Link: ${verificationLink}`
+    });
+
     console.log(`✅ Verification email sent to ${userEmail}`);
     return { success: true, message: 'Verification email sent successfully' };
   } catch (error) {
-    console.error('❌ Verification email sending error (Brevo):', error && (error.body || error.response?.text || error.message || error));
+    console.error('❌ Verification email sending error (SMTP):', error.message);
     return { success: false, message: 'Failed to send verification email' };
   }
 };
