@@ -11,18 +11,36 @@ const connectDB = require('./Models/db');
 const app = express();
 const server = http.createServer(app);
 
-// Determine allowed origins - allow all Vercel preview deployments and production
+// Determine allowed origins
 const allowedOrigins = [
-  process.env.FRONTEND_BASE_URL,
+  process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
   'http://localhost:3000',
-  'http://localhost:5000',
-  /^https:\/\/.*\.vercel\.app$/  // Allow all Vercel deployments
+  'http://localhost:5000'
 ];
+
+// CORS origin checker function
+const corsOriginChecker = (origin, callback) => {
+  // Allow requests with no origin (like mobile apps or curl requests)
+  if (!origin) return callback(null, true);
+  
+  // Check if origin is in allowed list
+  if (allowedOrigins.includes(origin)) {
+    callback(null, true);
+  } 
+  // Check if origin matches Vercel pattern
+  else if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
+    callback(null, true);
+  } 
+  // Otherwise reject
+  else {
+    callback(new Error('Not allowed by CORS'));
+  }
+};
 
 const io = new Server(server, {
   path: '/socket.io/',
   cors: {
-    origin: allowedOrigins,
+    origin: corsOriginChecker,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -39,7 +57,7 @@ app.use(helmet({
   crossOriginResourceSharing: true
 }));
 app.use(cors({
-  origin: allowedOrigins,
+  origin: corsOriginChecker,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
