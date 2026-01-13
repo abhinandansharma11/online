@@ -10,16 +10,29 @@ const connectDB = require('./Models/db');
 
 const app = express();
 const server = http.createServer(app);
+
+// Determine allowed origins
+const allowedOrigins = [
+  process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
+  'http://localhost:3000',
+  'https://online-nine-chi.vercel.app'
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_BASE_URL,
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
   }
 });
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_BASE_URL,
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
