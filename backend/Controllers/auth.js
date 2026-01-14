@@ -36,6 +36,7 @@ exports.studentLogin = async (req, res, next) => {
   if (!errors.isEmpty()) return res.status(400).json({ success: false, message: 'Invalid input', errors: errors.array() });
   try {
     const email = (req.body.email || '').toLowerCase();
+    console.log('[AUTH] Student login attempt:', email);
     const student = await Student.findOne({ email });
     if (!student) return res.status(400).json({ success: false, message: 'Invalid credentials' });
     if (!student.isVerified) return res.status(403).json({ success: false, message: 'Email not verified. Please verify your email before logging in.' });
@@ -53,6 +54,10 @@ exports.studentLogin = async (req, res, next) => {
       }
     });
   } catch (err) {
+    console.error('[AUTH] Student login error:', err.message);
+    if (err.message.includes('buffering timed out') || err.message.includes('connection')) {
+      return res.status(503).json({ success: false, message: 'Database connection failed - please try again later' });
+    }
     next(err);
   }
 };
