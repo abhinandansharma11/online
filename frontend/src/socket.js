@@ -18,18 +18,42 @@ if (API_BASE.endsWith("/api")) {
   API_BASE = API_BASE.slice(0, -5);
 }
 
-const socket = io(API_BASE, {
-  path: '/socket.io/',
-  transports: ["polling", "websocket"], // polling first for Vercel compatibility
-  autoConnect: true,
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  secure: true,
-  rejectUnauthorized: false,
-  withCredentials: true
-});
+// Create socket with error handling - socket.io may not work on Vercel serverless
+let socket = null;
+
+try {
+  socket = io(API_BASE, {
+    path: '/socket.io/',
+    transports: ["polling", "websocket"],
+    autoConnect: true,
+    reconnection: true,
+    reconnectionAttempts: 3,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    secure: true,
+    rejectUnauthorized: false,
+    withCredentials: true,
+    timeout: 10000
+  });
+
+  socket.on('connect_error', (error) => {
+    console.warn('[Socket.IO] Connection error (this is okay on Vercel):', error.message);
+  });
+
+  socket.on('error', (error) => {
+    console.warn('[Socket.IO] Socket error:', error);
+  });
+} catch (error) {
+  console.warn('[Socket.IO] Failed to initialize socket:', error.message);
+  // Create a mock socket object that doesn't throw errors
+  socket = {
+    on: () => {},
+    emit: () => {},
+    off: () => {},
+    disconnect: () => {},
+    connected: false
+  };
+}
 
 export default socket;
 
