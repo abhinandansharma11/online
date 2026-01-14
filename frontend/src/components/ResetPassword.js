@@ -2,7 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css"; // Using the same CSS as LoginPage
 
-const API_BASE = process.env.REACT_APP_API_BASE;
+let API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+
+// Ensure API_BASE is an absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
 
 const ResetPassword = () => {
   const navigate = useNavigate();

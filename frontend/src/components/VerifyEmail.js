@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './LoginPage.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE;
+let API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+
+// Ensure API_BASE is an absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
