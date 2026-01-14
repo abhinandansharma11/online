@@ -1,5 +1,5 @@
-// verify_password.js
-const bcrypt = require('bcrypt');
+// verify_password.js  
+const bcrypt = require('bcrypt');  
 
 async function verifyPassword() {
     const enteredPassword = "ark12345"; // What user typed
@@ -14,4 +14,8 @@ async function verifyPassword() {
     }
 }
 
+
 verifyPassword();
+
+
+
