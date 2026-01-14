@@ -43,7 +43,7 @@ const io = new Server(server, {
   path: '/socket.io/',
   cors: {
     origin: corsOriginChecker,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
   },
