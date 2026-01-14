@@ -3,8 +3,17 @@ import socket from "../socket";
 import { useNavigate } from "react-router-dom";
 import "./MenuManager.css";
 
-// Add API base
-const API_BASE = (process.env.REACT_APP_API_BASE || '').replace(/\/$/, '') || 'http://localhost:5000';
+
+// Safe API base (same logic as LoginPage)
+let API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+
+// Ensure absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
+
+// Remove trailing slash if present
+API_BASE = API_BASE.replace(/\/$/, "");
 
 const MenuManager = () => {
   const navigate = useNavigate();
