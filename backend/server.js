@@ -20,7 +20,7 @@ const allowedOrigins = [
   'http://localhost:5000'
 ];
 
-// CORS origin checker function - MORE PERMISSIVE FOR VERCEL
+// CORS origin checker function
 const corsOriginChecker = (origin, callback) => {
   // Allow requests with no origin (like mobile apps or curl requests)
   if (!origin) return callback(null, true);
@@ -29,36 +29,28 @@ const corsOriginChecker = (origin, callback) => {
   if (allowedOrigins.includes(origin)) {
     return callback(null, true);
   } 
-  // Check if origin matches Vercel pattern (allow all vercel.app domains)
-  if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
+  // Check if origin matches Vercel pattern
+  else if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
     return callback(null, true);
+  } 
+  // Otherwise reject
+  else {
+    return callback(null, false);
   }
-  // Also allow localhost for development
-  if (origin === 'http://localhost:3000' || origin === 'http://localhost:5000') {
-    return callback(null, true);
-  }
-  
-  console.log('[CORS] Blocked origin:', origin);
-  return callback(null, true); // Allow for now - Vercel may not send origin on some requests
 };
 
 const io = new Server(server, {
   path: '/socket.io/',
   cors: {
-    origin: function(origin, callback) {
-      // Allow all origins for socket.io - more permissive
-      callback(null, true);
-    },
+    origin: corsOriginChecker,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    transports: ['websocket', 'polling']
+    allowedHeaders: ['Content-Type', 'Authorization']
   },
-  transports: ['polling', 'websocket'], // polling first for Vercel compatibility
+  transports: ['websocket', 'polling'],
   upgradeTimeout: 10000,
   pingTimeout: 60000,
-  pingInterval: 25000,
-  allowEIO3: true
+  pingInterval: 25000
 });
 
 // Middleware
