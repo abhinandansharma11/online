@@ -18,40 +18,50 @@ if (API_BASE.endsWith("/api")) {
   API_BASE = API_BASE.slice(0, -5);
 }
 
-// Create socket with error handling - socket.io may not work on Vercel serverless
+// Create socket with error handling
+// Note: Socket.IO does NOT work with Vercel serverless functions
+// Only enable for localhost development
 let socket = null;
 
-try {
-  socket = io(API_BASE, {
-    path: '/socket.io/',
-    transports: ["polling", "websocket"],
-    autoConnect: true,
-    reconnection: true,
-    reconnectionAttempts: 3,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    secure: true,
-    rejectUnauthorized: false,
-    withCredentials: true,
-    timeout: 10000
-  });
+const isLocalhost = API_BASE.includes('localhost');
 
-  socket.on('connect_error', (error) => {
-    console.warn('[Socket.IO] Connection error (this is okay on Vercel):', error.message);
-  });
+if (isLocalhost) {
+  try {
+    socket = io(API_BASE, {
+      path: '/socket.io/',
+      transports: ["websocket", "polling"],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      secure: false,
+      withCredentials: true
+    });
 
-  socket.on('error', (error) => {
-    console.warn('[Socket.IO] Socket error:', error);
-  });
-} catch (error) {
-  console.warn('[Socket.IO] Failed to initialize socket:', error.message);
-  // Create a mock socket object that doesn't throw errors
-  socket = {
-    on: () => {},
-    emit: () => {},
-    off: () => {},
+    socket.on('connect_error', (error) => {
+      console.error('[Socket.IO] Connection error:', error.message);
+    });
+  } catch (error) {
+    console.warn('[Socket.IO] Failed to initialize:', error.message);
+    socket = createMockSocket();
+  }
+} else {
+  // On Vercel or production, create a mock socket that doesn't try to connect
+  console.log('[Socket.IO] Disabled for Vercel deployment (not supported)');
+  socket = createMockSocket();
+}
+
+// Create a mock socket object that behaves like real socket but doesn't do anything
+function createMockSocket() {
+  return {
+    on: (event, callback) => {},
+    emit: (event, data) => {},
+    off: (event, callback) => {},
     disconnect: () => {},
-    connected: false
+    connected: false,
+    connect: () => {},
+    close: () => {}
   };
 }
 
