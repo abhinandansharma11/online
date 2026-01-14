@@ -18,50 +18,49 @@ if (API_BASE.endsWith("/api")) {
   API_BASE = API_BASE.slice(0, -5);
 }
 
-// Create socket with error handling
-// Note: Socket.IO does NOT work with Vercel serverless functions
-// Only enable for localhost development
+// Check if we're on Vercel (socket.io doesn't work with serverless)
+const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+
+// Create socket with autoConnect disabled if on Vercel
 let socket = null;
 
-const isLocalhost = API_BASE.includes('localhost');
+try {
+  socket = io(API_BASE, {
+    path: '/socket.io/',
+    transports: ["polling", "websocket"],
+    autoConnect: !isVercel, // Don't auto-connect on Vercel
+    reconnection: true,
+    reconnectionAttempts: 2,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 3000,
+    secure: true,
+    rejectUnauthorized: false,
+    withCredentials: true,
+    timeout: 5000
+  });
 
-if (isLocalhost) {
-  try {
-    socket = io(API_BASE, {
-      path: '/socket.io/',
-      transports: ["websocket", "polling"],
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      secure: false,
-      withCredentials: true
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('[Socket.IO] Connection error:', error.message);
-    });
-  } catch (error) {
-    console.warn('[Socket.IO] Failed to initialize:', error.message);
-    socket = createMockSocket();
+  if (isVercel) {
+    console.log('[Socket.IO] Disabled on Vercel (serverless limitation)');
   }
-} else {
-  // On Vercel or production, create a mock socket that doesn't try to connect
-  console.log('[Socket.IO] Disabled for Vercel deployment (not supported)');
-  socket = createMockSocket();
-}
 
-// Create a mock socket object that behaves like real socket but doesn't do anything
-function createMockSocket() {
-  return {
-    on: (event, callback) => {},
-    emit: (event, data) => {},
-    off: (event, callback) => {},
+  socket.on('connect_error', (error) => {
+    if (isVercel) {
+      console.warn('[Socket.IO] Disabled on Vercel - real-time features unavailable');
+    } else {
+      console.error('[Socket.IO] Connection error:', error);
+    }
+  });
+
+} catch (error) {
+  console.warn('[Socket.IO] Failed to initialize:', error.message);
+  // Create a mock socket object that gracefully handles all operations
+  socket = {
+    on: () => {},
+    emit: () => {},
+    off: () => {},
     disconnect: () => {},
     connected: false,
-    connect: () => {},
-    close: () => {}
+    connect: () => {}
   };
 }
 
