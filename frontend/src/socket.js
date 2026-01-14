@@ -20,7 +20,7 @@ if (API_BASE.endsWith("/api")) {
 
 const socket = io(API_BASE, {
   path: '/socket.io/',
-  transports: ["websocket", "polling"],
+  transports: ["polling", "websocket"], // polling first for Vercel compatibility
   autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,

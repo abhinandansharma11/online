@@ -47,10 +47,11 @@ const io = new Server(server, {
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
   },
-  transports: ['websocket', 'polling'],
+  transports: ['polling', 'websocket'], // polling first for Vercel compatibility
   upgradeTimeout: 10000,
   pingTimeout: 60000,
-  pingInterval: 25000
+  pingInterval: 25000,
+  allowEIO3: true
 });
 
 // Middleware
