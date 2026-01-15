@@ -6,7 +6,7 @@ const creators = [
     name: "ABHINANDAN KUMAR SHARMA",
     roll: "23IT3003",
     border: "yellow-glow-border",
-    img: "https://res.cloudinary.com/djdcwwpbl/image/upload/v1755123776/Screenshot_20250814_030122_3_jsfajx_e8ac0f.jpg", // Add your image URL here
+    img: "https://res.cloudinary.com/dvt6hb40d/image/upload/v1768513476/WhatsApp_Image_2026-01-16_at_3.14.03_AM_c3e1ow.jpg", // Add your image URL here
     socials: [
       { name: "LinkedIn", href: "https://www.linkedin.com/in/abhinandan-kumar-sharma-a09a53288?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app", icon: (
         <span className="mc-icon-placeholder">
