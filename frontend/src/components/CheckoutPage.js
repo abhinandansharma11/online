@@ -4,7 +4,17 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import "./CheckoutPage.css"
 
-const API_BASE = (process.env.REACT_APP_API_BASE || '').replace(/\/$/, '') || 'http://localhost:5000';
+// Safe API base (same pattern as LoginPage)
+let API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+
+// Ensure absolute URL
+if (!API_BASE.startsWith("http://") && !API_BASE.startsWith("https://")) {
+  API_BASE = "https://" + API_BASE;
+}
+
+// Remove trailing slash
+API_BASE = API_BASE.replace(/\/$/, "");
+
 // Cloudinary unsigned upload settings (set in frontend env for fastest flow)
 const CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UNSIGNED_PRESET;
