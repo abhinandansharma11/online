@@ -3,17 +3,12 @@ import "./MeetCreators.css";
 
 const creators = [
   {
-    name: "ARK  SHREE",
-    roll: "23CD3010",
+    name: "ABHINANDAN KUMAR SHARMA",
+    roll: "23IT3003",
     border: "yellow-glow-border",
     img: "https://res.cloudinary.com/djdcwwpbl/image/upload/v1755123776/Screenshot_20250814_030122_3_jsfajx_e8ac0f.jpg", // Add your image URL here
     socials: [
-      { name: "Instagram", href: "https://www.instagram.com/shreeark/", icon: (
-        <span className="mc-icon-placeholder">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" width="23" height="23" />
-        </span>
-      ) },
-      { name: "LinkedIn", href: "https://www.linkedin.com/in/arkshree", icon: (
+      { name: "LinkedIn", href: "https://www.linkedin.com/in/abhinandan-kumar-sharma-a09a53288?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app", icon: (
         <span className="mc-icon-placeholder">
           {/* LinkedIn SVG */}
           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0 0 48 48">
@@ -21,7 +16,7 @@ const creators = [
 </svg>
         </span>
       ) },
-      { name: "GitHub", href: "https://github.com/arkshree1", icon: (
+      { name: "GitHub", href: "https://github.com/abhinandansharma11", icon: (
         <span className="mc-icon-placeholder">
           {/* GitHub SVG */}
          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="31" height="31" viewBox="0 0 48 48">
@@ -31,44 +26,12 @@ const creators = [
       ) },
     ],
   },
-  {
-    name: "HARSH DUBEY",
-    roll: "23PP3007",
-    border: "blue-glow-border",
-    img: "https://res.cloudinary.com/djdcwwpbl/image/upload/v1755121888/Screenshot_20250814_032042_rfdgf9.jpg", // Add your image URL here
-    socials: [
-      { name: "Instagram", href: "https://www.instagram.com/harshonopps?igsh=bGE1aGczYnRoN3g3", icon: (
-        <span className="mc-icon-placeholder">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" width="22" height="22" />
-        </span>
-      ) },
-      { name: "LinkedIn", href: "https://www.linkedin.com/in/harshdubey03", icon: (
-        <span className="mc-icon-placeholder">
-          {/* LinkedIn SVG */}
-         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0 0 48 48">
-<path fill="#0288D1" d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z"></path><path fill="#FFF" d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z"></path>
-</svg>
-        </span>
-      ) },
-      { name: "Figma", href: "https://www.figma.com/@GOINHARSH", icon: (
-        <span className="mc-icon-placeholder">
-          {<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" id="figma">
-  <path fill="#0ACF83" d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z"></path>
-  <path fill="#A259FF" d="M4 12c0-2.208 1.792-4 4-4h4v8H8c-2.208 0-4-1.792-4-4z"></path>
-  <path fill="#F24E1E" d="M4 4c0-2.208 1.792-4 4-4h4v8H8C5.792 8 4 6.208 4 4z"></path>
-  <path fill="#FF7262" d="M12 0h4c2.208 0 4 1.792 4 4s-1.792 4-4 4h-4V0z"></path>
-  <path fill="#1ABCFE" d="M20 12c0 2.208-1.792 4-4 4s-4-1.792-4-4 1.792-4 4-4 4 1.792 4 4z"></path>
-</svg>}
-         
-        </span>
-      ) },
-    ],
-  },
+  
 ];
 
 const MeetCreators = () => (
   <section className="meet-creators-section">
-    <h2 className="meet-creators-title">Meet The Creators</h2>
+    <h2 className="meet-creators-title">Creator</h2>
     <div className="meet-creators-cards">
       {creators.map((creator, idx) => (
         <div className={`meet-creator-card ${creator.border}`} key={creator.roll}>
